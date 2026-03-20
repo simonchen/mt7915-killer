@@ -25,6 +25,7 @@ MT7915-Killer is a high-performance driver branch for MediaTek MT7915 (Wi-Fi 6).
 - CPU2: Bind Hard IRQs (mt7915e, mt7915e-hif) and mt76-tx workqueues.
 - CPU3: Offload HRTIMER tasks from CPU2 (sharing L1 Cache via VPE).
 - CPU0/1: Bind NAPI POLL workqueues and user-space apps.
+- All Ifaces should set rx-0/rps_cpus = 0. (NAPI-POLL mode)
 
 ## Stress Test Summary
 - Tested on MT7621 @1000MHz(Overclocking) with Killer-1535 NIC (PC runs on ```iperf3 -R -w 1M -P 1```)
