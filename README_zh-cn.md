@@ -28,7 +28,7 @@ MT7915-Killer 是针对 MediaTek MT7915 (Wi-Fi 6) 芯片的深度调优驱动分
 - CPU0/1: 绑定 NAPI POLL 工作队列进程及用户态应用。
 
 ## 压测表现
-在 MT7621 (880MHz) + Killer-1535 + (PC端运行 ```iperf3 -R -w 1M -P 1```) 环境下：
+在 MT7621 (1000MHz - 超频) + Killer-1535 + (PC端运行 ```iperf3 -R -w 1M -P 1```) 环境下：
 - 稳定性：12 小时+ 持续稳定在 250~300Mbps。
 - 自愈性：即便在高负载后期iperf3 (路由端）出现 Bad page state 隔离或内存同步回收，系统也能在分钟级内自动反弹。
 - 指标：Dirty memory 保持为 0kB，NET_RX/HRTIMER 软中断分布科学，高阶内存（Order 9-10）留存健康。
