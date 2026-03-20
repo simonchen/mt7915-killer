@@ -3,6 +3,13 @@
 # mt7915-killer
 MT7915-Killer is a high-performance driver branch for MediaTek MT7915 (Wi-Fi 6). Based on [openwrt/mt76](https://github.com/openwrt/mt76) (Dec 2022) with patches up to March 2026 (excl. WED), it is specifically tuned to extract maximum performance from weak CPUs like MT7621 and eliminate long-term aging/stuttering issues.
 
+## Perfermance
+- Avg. DL rate after running ```iperf3 -R -w 1M -P1``` 17 hours
+<img width="472" height="277" alt="Perf-250M-after-17hr" src="https://github.com/user-attachments/assets/a3427506-864b-4a91-a6b3-a278f230b77e" />
+
+**Note**:
+  you might don't have to worry about the DL rate even after 17 hrs, later on, you will see that peformance will be becoming boost again back to 250-300M+ 
+  
 ## Key Driver Optimizations (Linux 5.4.268)
 - Memory Optimization: Downgraded DMA allocation to Order-0 (4KB) to prevent latency and allocation failures caused by memory fragmentation on MIPS architectures.
 - WIFI5 Tuning: Optimized MSDU aggregation (Max 3 packets) for WIFI5 NICs (e.g., Killer-1535).
