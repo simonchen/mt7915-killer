@@ -5,10 +5,7 @@ MT7915-Killer is a high-performance driver branch for MediaTek MT7915 (Wi-Fi 6).
 
 ## Perfermance
 - The base of average DL rate after continuously running ```iperf3 -R -w 1M -P1``` for 17 hours
-<img width="472" height="277" alt="Perf-250M-after-17hr" src="https://github.com/user-attachments/assets/a3427506-864b-4a91-a6b3-a278f230b77e" />
-
-**Note**:
-  you might don't have to worry about the DL rate even after 17 hrs, later on, you will see that peformance will be becoming boost again back to 250-300M+ 
+<img width="472" height="277" alt="Perf-250M-after-17hr" src="iperf3-r-after-17hr.png" />
   
 ## Key Driver Optimizations (Linux 5.4.268)
 - Memory Optimization: Downgraded DMA allocation to Order-0 (4KB) to prevent latency and allocation failures caused by memory fragmentation on MIPS architectures.
