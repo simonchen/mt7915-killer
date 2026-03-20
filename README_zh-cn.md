@@ -11,7 +11,7 @@ MT7915-Killer 是针对 MediaTek MT7915 (Wi-Fi 6) 芯片的深度调优驱动分
 - 资源精简：裁减 RX 队列（8->5），精简 RX/TX_RING、MCU、WTBL 等各类描述符尺寸，降低内存足迹。
 - 驱动级 CPU 绑定：硬锁定 mt76-tx 工作线程至 CPU2，防止内核 IPI 调度漂移。
 
-## 建议部署架构
+## 建议部署架构 (CPU亲和性)
 - CPU2: 绑定硬中断 mt7915e (5G) 与 mt7915e-hif (2.4G)；运行 mt76-tx 发包聚合线程。
 - CPU3: 内核自动承接 CPU2 投递的 HRTIMER 任务（利用 VPE 共享 L1 Cache 特性）。
 - CPU0/1: 绑定 NAPI POLL 工作队列进程及用户态应用。
