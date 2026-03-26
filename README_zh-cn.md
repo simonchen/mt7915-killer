@@ -29,7 +29,7 @@ MT7915-Killer 是针对 MediaTek MT7915 (Wi-Fi 6) 芯片的深度调优驱动分
 ## 建议部署架构 (CPU亲和性)
 - CPU2: 绑定硬中断 mt7915e (5G) 与 mt7915e-hif (2.4G)；运行 mt76-tx 发包聚合线程。
 - CPU3: 内核自动承接 CPU2 投递的 HRTIMER 任务（利用 VPE 共享 L1 Cache 特性）。
-- CPU0/1: 绑定 NAPI POLL 工作队列进程及用户态应用。
+- CPU0/1/3: 绑定 NAPI POLL 工作队列进程及用户态应用。
 - 所有接口（Ifaces）均应将 `rx-0/rps_cpus` 设置为 0。（NAPI-POLL 模式）
 
 ## 压测表现
