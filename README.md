@@ -4,7 +4,7 @@
 Unlike generic drivers, **MT7915-Killer** is an ultra-stability, high-performance driver branch for MediaTek MT7915 (Wi-Fi 6) Based on [openwrt/mt76](https://github.com/openwrt/mt76) (Dec 2022) with patches up to March 2026 (excl. WED). This project moves beyond simple patching to implement deep driver-level logic optimization and kernel-level task offloading.
 
 # The Technical Breakthrough
-The true bottleneck of leagcy CPU MT7621 under Wi-Fi 6 is not raw data throughput, but Interrupt & Sampling Overhead. High-frequency HRTIMERs and redundant statistics polling lead to physical saturation of CPU3, creating a "performance aging" effect. By thinning these tasks, we achieve industrial-grade stability.
+At the driver level, high-frequency, redundant polling operations for statistical data were causing hardware sampling distortions on the MT7915; furthermore, the WTBL (Wireless Table) mechanism would subsequently amplify this issue, leading to reduced speeds for specific MAC addresses. Conversely, the true performance bottleneck in a Wi-Fi 6 environment—particularly on platforms utilizing traditional CPUs like the MT7621—is not the raw data throughput itself, but rather the "interrupt and sampling overhead." Through streamlined optimizations applied to both the driver level and the kernel architecture, we have successfully achieved industrial-grade system stability.
 
 ## Key Driver Optimizations (Linux 5.4.268)
   - **Stats_2 Lightweight Sampling**: The most important fix - Drastically reduced Wi-Fi statistics polling frequency, eliminating the "aging" effect where throughput drops after 12+ hours.
