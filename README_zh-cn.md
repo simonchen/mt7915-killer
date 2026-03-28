@@ -1,7 +1,7 @@
 [English](README.md)   [中文](README_zh-cn.md)
 
-# mt7915-killer
-MT7915-Killer 是针对 MediaTek MT7915 (Wi-Fi 6) 芯片的深度调优驱动分支。
+# mt7915-lite
+mt7915-lite 是针对 MediaTek MT7915 (Wi-Fi 6) 芯片的深度调优驱动分支。
 本项目基于 2022 年 12 月的 [openwrt/mt76](https://github.com/openwrt/mt76) 源码，集成了截至 2026 年 3 月除 WED 外的大部分补丁，本项目不仅仅局限于简单的补丁修补，更深入地实现了驱动层面的优化以及内核层面的任务卸载。
 
 # 技术突破
