@@ -1167,7 +1167,7 @@ static int mt7915_sta_set_txpwr(struct ieee80211_hw *hw,
 	/* NOTE: temporarily use 0 as minimum limit, which is a
 	 * global setting and will be applied to all stations.
 	 */
-	ret = mt7915_mcu_set_txpower_frame_min(phy, 0);
+	ret = mt7915_mcu_set_txpower_frame_min(phy, 20); // dbm * 0.5
 	if (ret)
 		goto out;
 
