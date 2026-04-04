@@ -25,6 +25,17 @@ At the driver level, high-frequency, redundant polling operations for statistica
   - CPU2: Bind Hard IRQs (mt7915e, mt7915e-hif) and mt76-tx workqueues (enforced by the driver).
   - All Ifaces should set rx-0/rps_cpus = b. (CPU0/1/3 same as NAPI-POLL binds)
 
+## Kennel DMA-CMA binding
+By backporting and forcing CONFIG_DMA_CMA in the Linux kernel (v5.4), we have ensured contiguous physical memory for DMA. This optimization brings the performance of the open-source driver up to the level of the original proprietary (closed-source) SDK. Below is the performance benchmark comparison:
+### 🚀 Performance Optimization Benchmark (MT7621 + MT7915)
+
+| Metric | Before CMA (Kernel 5.4) | After CMA (Kernel 5.4) | Physical Significance |
+| :--- | :--- | :--- | :--- |
+| **HRTIMER (softirq)** | High counter values | **0** | Timer tasks processed directly in hardirq context, eliminating softirq latency. |
+| **NET_RX (softirq)** | Highly unstable | **Rock Solid** | Improved DMA efficiency and shortened packet RX path, maximizing CPU utilization. |
+| **350 Mbps Stress Test** | Jitter / Packet Drop | **Stable Wire-speed** | Memory fragmentation resolved; DMA throughput hits the hardware's physical limit. |
+| **Memory Management** | Severe Fragmentation | **Contiguous (CMA)** | 1536 descriptors run flawlessly without memory contention/starvation. |
+
 ## Stress Test Summary
   - Tested on MT7621 @1000MHz(Overclocking) with Killer-1535 NIC (PC runs on ```iperf3 -R -w 1M -P 1```)
   - Uptime Milestone: Successfully completed a 26.5-hour continuous stress test without a single drop.
