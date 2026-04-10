@@ -7,6 +7,7 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/pci.h>
+#include <linux/of_reserved_mem.h>
 
 #include "mt7915.h"
 #include "mac.h"
@@ -118,6 +119,14 @@ static int mt7915_pci_probe(struct pci_dev *pdev,
 
 	pci_set_master(pdev);
 
+        if (pdev->dev.of_node) {
+                ret = of_reserved_mem_device_init(&pdev->dev);
+                if (ret)
+                        dev_warn(&pdev->dev, "failed to init reserved memory: %d\n", ret);
+                else
+                        dev_info(&pdev->dev, "attached to reserved memory\n");
+        }
+
 	ret = dma_set_mask(&pdev->dev, DMA_BIT_MASK(32));
 	if (ret)
 		return ret;
@@ -143,7 +152,7 @@ static int mt7915_pci_probe(struct pci_dev *pdev,
 	if (!ret) {
 		hif2 = mt7915_pci_init_hif2(pdev);
 
-		ret = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_ALL_TYPES);
+		ret = pci_alloc_irq_vectors(pdev, 1, 1, (PCI_IRQ_LEGACY | PCI_IRQ_MSI | PCI_IRQ_MSIX));
 		if (ret < 0)
 			goto free_device;
 
@@ -215,6 +224,8 @@ static void mt7915_pci_remove(struct pci_dev *pdev)
 	dev = container_of(mdev, struct mt7915_dev, mt76);
 	mt7915_put_hif2(dev->hif2);
 	mt7915_unregister_device(dev);
+	if (pdev->dev.of_node)
+		of_reserved_mem_device_release(&pdev->dev);
 }
 
 struct pci_driver mt7915_hif_driver = {
