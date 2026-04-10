@@ -935,7 +935,7 @@ mt7915_mac_tx_free_done(struct mt7915_dev *dev,
 {
 	struct sk_buff *skb, *tmp;
 
-	mt7915_mac_sta_poll(dev);
+	//mt7915_mac_sta_poll(dev);
 
 	if (wake)
 		mt76_set_tx_blocked(&dev->mt76, false);
@@ -2143,6 +2143,7 @@ void mt7915_mac_work(struct work_struct *work)
 
 	if (clear) {
 		u32 i;
+		mt7915_mac_sta_poll(dev);
 		mt7915_mac_sta_poll_clear(dev); // Reset sta ADM Counts
 		for (i = 0; i < 2; i++) // Reset global Band (backoff/eifs/obss)
 			mt7915_mac_refresh_wash(dev, i);
