@@ -6,7 +6,9 @@ Unlike generic drivers, **mt7915-lite** is an ultra-stability, high-performance 
 At the driver level, high-frequency, redundant polling operations for statistical data were causing hardware sampling distortions on the MT7915; furthermore, the WTBL (Wireless Table) mechanism would subsequently amplify this issue, leading to reduced speeds for specific MAC addresses. Conversely, the true performance bottleneck in a Wi-Fi 6 environment—particularly on platforms utilizing traditional CPUs like the MT7621—is not the raw data throughput itself, but rather the "interrupt and sampling overhead." Through streamlined optimizations applied to both the driver level and the kernel architecture, we have successfully achieved industrial-grade system stability.
 
 ## Key Driver Optimizations 
-  - **Stats_2 Lightweight Sampling**: The most important fix - Drastically reduced Wi-Fi statistics polling frequency, eliminating the "aging" effect where throughput drops after 12+ hours.
+  - AMPDU (RX) Re-construct to decouple `queue_delayed_work` that incurs a lot of HRTIMER softirqs once mutiple-cores becames busy,
+    that may further causes single-cpu core at 99% usage without dropping in a short time, the kernel will be falled in soft-irq storm.
+  - Stats_2 Lightweight Sampling: The most important fix - Drastically reduced Wi-Fi statistics polling frequency, eliminating the "aging" effect where throughput drops after 12+ hours.
   - Disable AMSDU - Offloading logic back to hardware
     Disabled software-level A-MSDU aggregation to reduce CPU overhead, combined with periodic asynchronous resetting of WTBL hardware counters.
   - Mitigating firmware-side heuristic penalties
