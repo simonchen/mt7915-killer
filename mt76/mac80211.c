@@ -1305,6 +1305,7 @@ void mt76_rx_complete(struct mt76_dev *dev, struct sk_buff_head *frames,
 void mt76_rx_poll_complete(struct mt76_dev *dev, enum mt76_rxq_id q,
 			   struct napi_struct *napi)
 {
+	static u32 fake_hash_roller = 0;
 	struct sk_buff_head frames;
 	struct sk_buff *skb;
 	struct mt76_rx_tid *last_tid = NULL;
@@ -1318,6 +1319,7 @@ void mt76_rx_poll_complete(struct mt76_dev *dev, enum mt76_rxq_id q,
 			last_tid = rcu_dereference(status->wcid->aggr[tidno]);
 		}
 		skb_record_rx_queue(skb, q); // recording the qid for RPS affinity
+		skb_set_hash(skb, (fake_hash_roller++ >> 2), PKT_HASH_TYPE_L3); // fake hash
 		mt76_check_sta(dev, skb);
 		if (mtk_wed_device_active(&dev->mmio.wed))
 			__skb_queue_tail(&frames, skb);
