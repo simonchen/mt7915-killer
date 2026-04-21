@@ -873,10 +873,11 @@ free_frag:
 	return done;
 }
 
-#define MAX_RX_POLL_RETRY 5 // at least 3
+#define MAX_RX_POLL_RETRY 3 // at least 1
 #define DEFAULT_RX_POLL_TIMEO 1000 // us
 #define MAX_SAMPLE_COUNT 10
 atomic_t rx_poll_retry_cnt = ATOMIC_INIT(MAX_RX_POLL_RETRY);
+bool rx_poll_retry_enable = false;
 int rx_poll_timeo = DEFAULT_RX_POLL_TIMEO;
 
 static void mt76_rx_poll_retry_adjust(u64 start_jif)
@@ -911,22 +912,28 @@ static void mt76_rx_poll_retry_adjust(u64 start_jif)
 
 	// check if the accumated count at MAX_RX_POLL_RETRY
 	val = atomic_read(&rx_poll_retry_cnt);
-	if (val >= MAX_RX_POLL_RETRY) {
-		rx_stats.max_retry_sum++; // recording the max_retry_sum
-	} else if (val >= (MAX_RX_POLL_RETRY-1)) {
-		rx_stats.mid_retry_sum++;
-	} else if (val >= (MAX_RX_POLL_RETRY-2)) {
-		rx_stats.min_retry_sum++;
-	}
-	if (rx_stats.total_sample_cnt >= MAX_SAMPLE_COUNT*10) {
-		if (rx_stats.max_retry_sum >= 3 ||
-				rx_stats.mid_retry_sum >= 5 ||
-				rx_stats.min_retry_sum >= 7) {
-			rx_poll_timeo -= 1; // us
-		} else {
-			rx_poll_timeo += 10; // us
+	if (val > 1) {
+		if (val >= MAX_RX_POLL_RETRY) {
+			rx_stats.max_retry_sum++; // recording the max_retry_sum
+		} else if (val >= (MAX_RX_POLL_RETRY-1)) {
+			rx_stats.mid_retry_sum++;
+		} else if (val >= (MAX_RX_POLL_RETRY-2)) {
+			rx_stats.min_retry_sum++;
 		}
-		if (rx_poll_timeo < 0) rx_poll_timeo = 0; // avoiding integer overflow when comparing to u32 or u64
+
+		if (rx_stats.total_sample_cnt >= MAX_SAMPLE_COUNT*10) {
+			if (rx_stats.max_retry_sum >= 3 ||
+					rx_stats.mid_retry_sum >= 5 ||
+					rx_stats.min_retry_sum >= 7) {
+				rx_poll_timeo -= 1; // us
+			} else {
+				rx_poll_timeo += 10; // us
+			}
+			if (rx_poll_timeo < 0) rx_poll_timeo = 0; // avoiding integer overflow when comparing to u32 or u64
+		}
+	}
+
+	if (rx_stats.total_sample_cnt >= MAX_SAMPLE_COUNT*10) {
 		rx_stats.total_sample_cnt = 0;
 		rx_stats.max_retry_sum = 0; rx_stats.mid_retry_sum = 0; rx_stats.min_retry_sum = 0; // reset
 	}
@@ -936,7 +943,7 @@ int mt76_dma_rx_poll(struct napi_struct *napi, int budget)
 {
 	struct mt76_dev *dev = NULL;
 	int qid, done = 0, cur;
-	int retry_limit = atomic_read(&rx_poll_retry_cnt); 
+	int retry_limit = (!rx_poll_retry_enable) ? 0 : atomic_read(&rx_poll_retry_cnt); 
 	u64 start_jif = ktime_get();
 
 	dev = container_of(napi->dev, struct mt76_dev, napi_dev);
@@ -956,19 +963,15 @@ rev_dma:
 	if (done < budget && napi_complete(napi)) {
 		if (done) wmb(); // sync. cpu write
 		dev->drv->rx_poll_complete(dev, qid);
-		mt76_rx_poll_retry_adjust(start_jif);
+		if (rx_poll_retry_enable) mt76_rx_poll_retry_adjust(start_jif);
 		udelay(1); return done;
-	}else if (--retry_limit > 0) {
-		if (unlikely(tif_need_resched())) {
-			cond_resched();
-			mt76_rx_poll_retry_adjust(start_jif);
-			return done;
-		}
+	}else if (--retry_limit >= 0) {
+		if (rx_poll_retry_enable) mt76_rx_poll_retry_adjust(start_jif);
 		done = 0;
 		udelay(1); goto rev_dma;
 	}
 
-	mt76_rx_poll_retry_adjust(start_jif);
+	if (rx_poll_retry_enable) mt76_rx_poll_retry_adjust(start_jif);
 	return done;
 }
 EXPORT_SYMBOL_GPL(mt76_dma_rx_poll);

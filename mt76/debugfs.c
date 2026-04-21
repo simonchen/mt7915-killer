@@ -195,6 +195,8 @@ mt76_register_debugfs_fops(struct mt76_phy *phy,
 	debugfs_create_devm_seqfile(dev->dev, "rx-poll-retry-cnt", dir, mt76_rx_poll_retry_cnt_read);
 	debugfs_create_file_unsafe("rx-poll-timeo", 0600, dir, dev, &fops_rx_poll_timeo);
 
+	debugfs_create_bool("rx-poll-retry-active", 0600, dir, &rx_poll_retry_enable);
+
 	return dir;
 }
 EXPORT_SYMBOL_GPL(mt76_register_debugfs_fops);

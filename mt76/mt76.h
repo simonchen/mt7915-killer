@@ -22,10 +22,10 @@
 #define MT_RX_BUF_SIZE		2048
 #define MT_SKB_HEAD_LEN		256
 
-#define MT_MAX_NON_AQL_PKT	16
-#define MT_TXQ_FREE_THR		32
+#define MT_MAX_NON_AQL_PKT	32
+#define MT_TXQ_FREE_THR		64
 
-#define MT76_TOKEN_FREE_THR	64
+#define MT76_TOKEN_FREE_THR	128
 
 #define MT_QFLAG_WED_RING	GENMASK(1, 0)
 #define MT_QFLAG_WED_TYPE	GENMASK(3, 2)
@@ -742,6 +742,7 @@ struct mt76_phy {
 };
 
 extern atomic_t rx_poll_retry_cnt;
+extern bool rx_poll_retry_enable;
 extern int rx_poll_timeo;
 
 struct mt76_dev {
